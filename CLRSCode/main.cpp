@@ -24,6 +24,8 @@ int main ()
 	zm::QUICKSORT_Benchmark<ISPRINT, 2>(LENGTH);
 	zm::QUICKSORT_Benchmark<ISPRINT, 3>(LENGTH);
 
+	zm::HEAPSORT_Benchmark<ISPRINT>(LENGTH);
+
 	zm::STL_SORT_Benchmark<ISPRINT>(LENGTH);
 
 	zm::BINARY_SEARCH_Benchmark<1>(LENGTH);

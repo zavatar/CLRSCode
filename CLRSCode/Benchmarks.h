@@ -55,8 +55,10 @@ template <bool ISPRINT>
 void ASSERTSORTED(float *A, int A_length)
 {
 	for (int i(0); i < A_length-1; i++)
-		if (A[i] > A[i+1])
+		if (A[i] > A[i+1]) {
 			printf("Unsorted\n");
+			exit(-1);
+		}
 	if (ISPRINT)
 		PRINT(A, A_length);
 }
@@ -214,6 +216,27 @@ void Exercise_3_3_7(int LENGTH)
 	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
 	std::cout << sum1 << "==" << sum2 << std::endl;
 
+	delete []A;
+}
+
+template <bool ISPRINT>
+void HEAPSORT_Benchmark(int LENGTH)
+{
+	LARGE_INTEGER t1, t2;
+	std::cout<<"\nHEAPSORT: \n";
+
+	float *A = new float[LENGTH];
+	RANDOMFILL<ISPRINT>(A, LENGTH);
+
+	HEAP<float> heap;
+
+	QueryPerformanceCounter(&t1);
+
+	heap.HEAPSORT(A, LENGTH);
+
+	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+
+	ASSERTSORTED<ISPRINT>(A, LENGTH);
 	delete []A;
 }
 

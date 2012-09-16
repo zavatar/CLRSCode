@@ -16,6 +16,12 @@
 
 namespace zm {
 
+template <typename T> inline
+void exchange(T &a, T &b)
+{
+	T tmp = a; a = b; b = tmp;
+}
+
 // NOTE: 
 // 1. For supporting index 0, 'i' must be signed.
 template <typename T>
@@ -122,10 +128,10 @@ int PARTITION(T *A, int p, int r)
 		if (A[j] <= x)
 		{
 			i = i+1;
-			T tmp = A[i]; A[i] = A[j]; A[j] = tmp;
+			exchange(A[i], A[j]);
 		}
 	}
-	T tmp = A[i+1]; A[i+1] = A[r]; A[r] = tmp;
+	exchange(A[i+1], A[r]);
 	return i+1;
 }
 
@@ -133,7 +139,7 @@ template <typename T>
 int RANDOMIZED_PARTITION(T *A, int p, int r)
 {
 	int i = p+int((float)rand()/(float)RAND_MAX*(r-p));
-	T tmp = A[i]; A[i] = A[r]; A[r] = tmp;
+	exchange(A[i], A[r]);
 	return PARTITION(A, p, r);
 }
 
@@ -169,6 +175,73 @@ void TAIL_RECURSIVE_QUICKSORT(T *A, int p, int r)
 		p = q+1;
 	}
 }
+
+template <typename T>
+class HEAP
+{
+public:
+
+	HEAP (){}
+
+	~HEAP(){}
+
+	void HEAPSORT(T *A, int A_length)
+	{
+		BUILD_MAX_HEAP(A, A_length);
+		int A_heap_size = A_length;
+		for (int i(A_length-1); i > 0; i--)
+		{
+			exchange(A[0], A[i]);
+			A_heap_size = A_heap_size-1;
+			MAX_HEAPIFY(A, A_heap_size, 0);
+		}
+	}
+
+private:
+
+	HEAP(const HEAP&){}
+
+	HEAP& operator=(const HEAP&){}
+
+	inline int PARENT(int i)
+	{
+		return i/2;
+	}
+
+	inline int LEFT(int i)
+	{
+		return 2*i;
+	}
+
+	inline int RIGHT(int i)
+	{
+		return 2*i+1;
+	}
+
+	void MAX_HEAPIFY(T *A, int A_heap_size, int i)
+	{
+		int l = LEFT(i);
+		int r = RIGHT(i);
+		int largest;
+		if (l < A_heap_size && A[l] > A[i])
+			largest = l;
+		else
+			largest = i;
+		if (r < A_heap_size && A[r] > A[largest])
+			largest = r;
+		if (largest != i)
+		{
+			exchange(A[i], A[largest]);
+			MAX_HEAPIFY(A, A_heap_size, largest);
+		}
+	}
+
+	void BUILD_MAX_HEAP(T *A, int A_length)
+	{
+		for (int i(A_length/2-1); i >= 0; i--)
+			MAX_HEAPIFY(A, A_length, i);
+	}
+};
 
 } // namespace
 
