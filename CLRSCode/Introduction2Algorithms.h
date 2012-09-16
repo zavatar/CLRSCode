@@ -176,72 +176,102 @@ void TAIL_RECURSIVE_QUICKSORT(T *A, int p, int r)
 	}
 }
 
-template <typename T>
-class HEAP
+inline int HEAP_PARENT(int i)
 {
-public:
+	return i/2;
+}
 
-	HEAP (){}
+inline int HEAP_LEFT(int i)
+{
+	return 2*i;
+}
 
-	~HEAP(){}
+inline int HEAP_RIGHT(int i)
+{
+	return 2*i+1;
+}
 
-	void HEAPSORT(T *A, int A_length)
+template <typename T>
+void MAX_HEAPIFY(T *A, int A_heap_size, int i)
+{
+	int l = HEAP_LEFT(i);
+	int r = HEAP_RIGHT(i);
+	int largest;
+	if (l < A_heap_size && A[l] > A[i])
+		largest = l;
+	else
+		largest = i;
+	if (r < A_heap_size && A[r] > A[largest])
+		largest = r;
+	if (largest != i)
 	{
-		BUILD_MAX_HEAP(A, A_length);
-		int A_heap_size = A_length;
-		for (int i(A_length-1); i > 0; i--)
-		{
-			exchange(A[0], A[i]);
-			A_heap_size = A_heap_size-1;
-			MAX_HEAPIFY(A, A_heap_size, 0);
-		}
+		exchange(A[i], A[largest]);
+		MAX_HEAPIFY(A, A_heap_size, largest);
 	}
+}
 
-private:
+template <typename T>
+void BUILD_MAX_HEAP(T *A, int A_heap_size)
+{
+	for (int i(A_heap_size/2-1); i >= 0; i--)
+		MAX_HEAPIFY(A, A_heap_size, i);
+}
 
-	HEAP(const HEAP&){}
-
-	HEAP& operator=(const HEAP&){}
-
-	inline int PARENT(int i)
+template <typename T>
+void HEAPSORT(T *A, int A_length)
+{
+	int A_heap_size = A_length;
+	BUILD_MAX_HEAP(A, A_heap_size);
+	for (int i(A_length-1); i > 0; i--)
 	{
-		return i/2;
+		exchange(A[0], A[i]);
+		A_heap_size = A_heap_size-1;
+		MAX_HEAPIFY(A, A_heap_size, 0);
 	}
+}
 
-	inline int LEFT(int i)
-	{
-		return 2*i;
-	}
+template <typename T>
+inline int HEAP_MAXIMUM(T *A)
+{
+	return A[0];
+}
 
-	inline int RIGHT(int i)
-	{
-		return 2*i+1;
+template <typename T>
+int HEAP_EXTRACT_MAX(T *A, int &A_heap_size)
+{
+	if (A_heap_size < 1) {
+		printf("heap underflow\n");
+		exit(-1);
 	}
+	int max = A[0];
+	A[0] = A[A_heap_size-1];
+	A_heap_size = A_heap_size-1;
+	MAX_HEAPIFY(A, A_heap_size, 0);
+	return max;
+}
 
-	void MAX_HEAPIFY(T *A, int A_heap_size, int i)
-	{
-		int l = LEFT(i);
-		int r = RIGHT(i);
-		int largest;
-		if (l < A_heap_size && A[l] > A[i])
-			largest = l;
-		else
-			largest = i;
-		if (r < A_heap_size && A[r] > A[largest])
-			largest = r;
-		if (largest != i)
-		{
-			exchange(A[i], A[largest]);
-			MAX_HEAPIFY(A, A_heap_size, largest);
-		}
+template <typename T>
+void HEAP_INCREASE_KEY(T *A, int i, T key)
+{
+	if (key < A[i]) {
+		printf("new key is smaller than current key\n");
+		exit(-1);
 	}
+	A[i] = key;
+	while (i > 0 && A[HEAP_PARENT(i)] < A[i])
+	{
+		exchange(A[i], A[HEAP_PARENT(i)]);
+		i = HEAP_PARENT(i);
+	}
+}
 
-	void BUILD_MAX_HEAP(T *A, int A_length)
-	{
-		for (int i(A_length/2-1); i >= 0; i--)
-			MAX_HEAPIFY(A, A_length, i);
-	}
-};
+template <typename T>
+void MAX_HEAP_INSERT(T *A, int &A_heap_size, T key)
+{
+	A_heap_size = A_heap_size+1;
+	A[A_heap_size] = key;
+	HEAP_INCREASE_KEY(A, A_heap_size, key);
+}
 
 } // namespace
 

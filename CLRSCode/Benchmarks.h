@@ -133,10 +133,10 @@ void QUICKSORT_Benchmark(int LENGTH)
 }
 
 template <bool ISPRINT>
-void STL_SORT_Benchmark(int LENGTH)
+void STL_sort_Benchmark(int LENGTH)
 {
 	LARGE_INTEGER t1, t2;
-	std::cout<<"\nSTL_SORT: \n";
+	std::cout<<"\nSTL_sort: \n";
 
 	std::vector<float> vA(LENGTH);
 	RANDOMFILL<ISPRINT>(&vA[0], LENGTH);
@@ -228,16 +228,33 @@ void HEAPSORT_Benchmark(int LENGTH)
 	float *A = new float[LENGTH];
 	RANDOMFILL<ISPRINT>(A, LENGTH);
 
-	HEAP<float> heap;
-
 	QueryPerformanceCounter(&t1);
 
-	heap.HEAPSORT(A, LENGTH);
+	HEAPSORT(A, LENGTH);
 
 	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
 
 	ASSERTSORTED<ISPRINT>(A, LENGTH);
 	delete []A;
+}
+
+template <bool ISPRINT>
+void STL_sort_heap_Benchmark(int LENGTH)
+{
+	LARGE_INTEGER t1, t2;
+	std::cout<<"\nSTL_sort_heap: \n";
+
+	std::vector<float> vA(LENGTH);
+	RANDOMFILL<ISPRINT>(&vA[0], LENGTH);
+
+	QueryPerformanceCounter(&t1);
+
+	std::make_heap(vA.begin(), vA.end());
+	std::sort_heap(vA.begin(), vA.end());
+
+	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+
+	ASSERTSORTED<ISPRINT>(&vA[0], LENGTH);
 }
 
 } // namespace
