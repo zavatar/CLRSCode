@@ -77,6 +77,7 @@
     <ClInclude Include="Benchmarks.h" />
     <ClInclude Include="Exercises.h" />
     <ClInclude Include="Introduction2Algorithms.h" />
+    <ClInclude Include="ProgrammingPearls.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

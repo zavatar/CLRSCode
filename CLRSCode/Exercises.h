@@ -12,10 +12,9 @@
 #ifndef Exercises_H
 #define Exercises_H
 
-#include <stdio.h>
 #include "Introduction2Algorithms.h"
 
-namespace zm {
+namespace clrs {
 
 // NOTE: Exercise 2.3-7
 // Describe a жи(n*lgn)-time algorithm that, given a set S of n integers and

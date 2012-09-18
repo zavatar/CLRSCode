@@ -14,7 +14,7 @@
 
 #include <iostream>
 
-namespace zm {
+namespace clrs {
 
 template <typename T> inline
 void exchange(T &a, T &b)

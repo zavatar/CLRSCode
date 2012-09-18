@@ -14,6 +14,7 @@
 
 #include "Introduction2Algorithms.h"
 #include "Exercises.h"
+#include "ProgrammingPearls.h"
 
 #include <iostream>
 #include <ctime>
@@ -21,7 +22,7 @@
 #include <algorithm>
 #include <windows.h>
 
-namespace zm {
+namespace {
 
 void PRINT(float *A, int A_length)
 {
@@ -62,6 +63,10 @@ void ASSERTSORTED(float *A, int A_length)
 	if (ISPRINT)
 		PRINT(A, A_length);
 }
+
+} // namespace
+
+namespace clrs {
 
 template <bool ISPRINT>
 void INSERTION_SORT_Benchmark(int LENGTH)
@@ -160,7 +165,7 @@ void BINARY_SEARCH_Benchmark(int LENGTH)
 	RANDOMFILL<false>(A, LENGTH);
 
 	// Remember sort first
-	zm::QUICKSORT(A, 0, LENGTH-1);
+	QUICKSORT(A, 0, LENGTH-1);
 
 	int Idx = int((float)rand()/(float)RAND_MAX*(LENGTH-1));
 	std::cout << "Idx = " << Idx << std::endl;
@@ -258,5 +263,76 @@ void STL_sort_heap_Benchmark(int LENGTH)
 }
 
 } // namespace
+
+namespace pp {
+
+template <bool ISPRINT, int WHICH>
+void isort_Benchmark(int LENGTH)
+{
+	LARGE_INTEGER t1, t2;
+	std::cout<<"\nisort: (" << WHICH << ")\n"; 
+
+	float *A = new float[LENGTH];
+	RANDOMFILL<ISPRINT>(A, LENGTH);
+
+	QueryPerformanceCounter(&t1);
+
+	switch (WHICH)
+	{
+	case 2:
+		isort2(A, LENGTH);
+		break;
+	case 3:
+		isort3(A, LENGTH);
+		break;
+	case 1:
+	default:
+		isort1(A, LENGTH);
+	}
+
+	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+
+	ASSERTSORTED<ISPRINT>(A, LENGTH);
+	delete []A;
+}
+
+template <bool ISPRINT, int WHICH>
+void Problems9_5_4(int LENGTH)
+{
+	LARGE_INTEGER t1, t2;
+	std::cout<<"\nProblems9_5_4: (" << WHICH << ")\n";
+
+	float *A = new float[LENGTH];
+	RANDOMFILL<ISPRINT>(A, LENGTH);
+
+	QueryPerformanceCounter(&t1);
+
+	float maximum;
+	switch (WHICH)
+	{
+	case 2:
+		maximum = arrmaxMacro(A, LENGTH);
+		break;
+	case 1:
+	default:
+		maximum = arrmax(A, LENGTH);
+	}
+
+	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+
+	switch (WHICH)
+	{
+	case 2:
+		std::cout << "Macro Maximum: " << maximum << std::endl;
+		break;
+	case 1:
+	default:
+		std::cout << "Inline Maximum: " << maximum << std::endl;
+	}
+
+	delete []A;
+}
+
+}
 
 #endif
