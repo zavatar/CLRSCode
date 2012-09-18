@@ -12,7 +12,8 @@
 #ifndef Introduction2Algorithms_H
 #define Introduction2Algorithms_H
 
-#include <iostream>
+#include "ProgrammingPearls.h"
+#include <cfloat>
 
 namespace clrs {
 
@@ -41,7 +42,7 @@ void INSERTION_SORT(T *A, int A_length)
 }
 
 // NOTE: 
-// 1. The infinite number using FLT_MAX violate typename T. updated by 2.3-2
+// 1. The infinite number using FLT_MAX violate typename T. updated by Excercise 2.3-2
 // 2. For indexing from 0, note the change $2.
 template <typename T>
 void MERGE(T *A, int p, int q, int r)
@@ -173,6 +174,74 @@ void TAIL_RECURSIVE_QUICKSORT(T *A, int p, int r)
 		int q = PARTITION(A, p, r);
 		TAIL_RECURSIVE_QUICKSORT(A, p, q-1);
 		p = q+1;
+	}
+}
+
+// NOTE: 
+// 1. The infinite number using FLT_MAX violate typename T. 
+// (Could be solved using template in the future.)
+template <typename T>
+T FIND_MAX_CROSSING_SUBARRAY(T *A, int low, int mid, int high,
+	int &max_left, int &max_right)
+{
+	T left_sum = -FLT_MAX; // $1
+	T sum = 0;
+	for (int i(mid); i >= low; i--)
+	{
+		sum = sum + A[i];
+		if (sum > left_sum)
+		{
+			left_sum = sum;
+			max_left = i;
+		}
+	}
+	T right_sum = -FLT_MAX; // $1
+	sum = 0;
+	for (int j(mid+1); j <= high; j++)
+	{
+		sum = sum + A[j];
+		if (sum > right_sum)
+		{
+			right_sum = sum;
+			max_right = j;
+		}
+	}
+	return left_sum + right_sum;
+}
+
+template <typename T>
+T FIND_MAXIMUM_SUBARRAY(T *A, int low, int high,
+	int &max_left, int &max_right)
+{
+	if (high == low)
+	{
+		max_left = low;
+		max_right = high;
+		return A[low];
+	}
+
+	int mid = (low + high) / 2;
+	int left_low, left_high;
+	T left_sum = FIND_MAXIMUM_SUBARRAY(A, low, mid, left_low, left_high);
+	int right_low, right_high;
+	T right_sum = FIND_MAXIMUM_SUBARRAY(A, mid+1, high, right_low, right_high);
+	int cross_low, cross_high;
+	T cross_sum = FIND_MAX_CROSSING_SUBARRAY(A, low, mid, high, cross_low, cross_high);
+
+	if (left_sum >= right_sum && left_sum >= cross_sum)
+	{
+		max_left = left_low;
+		max_right = left_high;
+		return left_sum;
+	} else if (right_sum >= left_sum && right_sum >= cross_sum)
+	{
+		max_left = right_low;
+		max_right = right_high;
+		return right_sum;
+	} else {
+		max_left = cross_low;
+		max_right = cross_high;
+		return cross_sum;
 	}
 }
 

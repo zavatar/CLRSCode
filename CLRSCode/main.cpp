@@ -14,7 +14,8 @@
 int main ()
 {
 	const bool ISPRINT(false);
-	const int LENGTH(1<<16); // (1<<20) 1MB, (1<<16) 64KB
+	const int LENGTH(1<<20); // (1<<20) 1MB, (1<<16) 64KB
+	const float CNT(-.5f);
 
 // 	clrs::INSERTION_SORT_Benchmark<ISPRINT>(LENGTH);
 // 	pp::isort_Benchmark<ISPRINT, 3>(LENGTH);
@@ -36,8 +37,14 @@ int main ()
 // 	clrs::Exercise_3_3_7<1>(LENGTH);
 // 	clrs::Exercise_3_3_7<2>(LENGTH);
 
+	clrs::FIND_MAXIMUM_SUBARRAY_Benchmark<ISPRINT>(LENGTH, CNT);
+	clrs::Exercise_4_1_4<ISPRINT>(LENGTH, CNT);
+	clrs::Exercise_4_1_5<ISPRINT>(LENGTH, CNT);
+// 	pp::maxsum_Benchmark<ISPRINT, 3>(LENGTH, CNT);
+// 	pp::maxsum_Benchmark<ISPRINT, 4>(LENGTH, CNT);
+
 // 	pp::Problems9_5_4<ISPRINT, 1>(LENGTH);
 // 	pp::Problems9_5_4<ISPRINT, 2>(LENGTH);
-	
+
 	return 0;
 }

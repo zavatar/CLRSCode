@@ -67,6 +67,20 @@ T sum_exist2(T *A, T x, int A_length)
 	}
 }
 
+// NOTE: Exercise 4.1-4, I am not sure.
+template <typename T>
+T FIND_MAXIMUM_SUBARRAY_DAC(T *A, int low, int high, int &left, int &right)
+{
+	return pp::maxsum3(A, low, high, left, right);
+}
+
+// NOTE: Exercise 4.1-5
+template <typename T>
+T FIND_MAXIMUM_SUBARRAY_SCAN(T *A, int A_length, int &left, int &right)
+{
+	return pp::maxsum4(A, A_length, left, right);
+}
+
 } // namespace
 
 #endif
