@@ -37,14 +37,18 @@ int main ()
 // 	clrs::Exercise_3_3_7<1>(LENGTH);
 // 	clrs::Exercise_3_3_7<2>(LENGTH);
 
-	clrs::FIND_MAXIMUM_SUBARRAY_Benchmark<ISPRINT>(LENGTH, CNT);
-	clrs::Exercise_4_1_4<ISPRINT>(LENGTH, CNT);
-	clrs::Exercise_4_1_5<ISPRINT>(LENGTH, CNT);
+// 	clrs::FIND_MAXIMUM_SUBARRAY_Benchmark<ISPRINT>(LENGTH, CNT);
+// 	clrs::Exercise_4_1_4<ISPRINT>(LENGTH, CNT);
+// 	clrs::Exercise_4_1_5<ISPRINT>(LENGTH, CNT);
 // 	pp::maxsum_Benchmark<ISPRINT, 3>(LENGTH, CNT);
 // 	pp::maxsum_Benchmark<ISPRINT, 4>(LENGTH, CNT);
 
 // 	pp::Problems9_5_4<ISPRINT, 1>(LENGTH);
 // 	pp::Problems9_5_4<ISPRINT, 2>(LENGTH);
+
+// Temp
+
+	memset_fill_Benchmark(LENGTH);
 
 	return 0;
 }

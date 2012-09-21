@@ -435,6 +435,30 @@ void Problems9_5_4(int LENGTH)
 	delete []A;
 }
 
+} // namespace
+
+// Temp
+void memset_fill_Benchmark(int LENGTH)
+{
+	LARGE_INTEGER t1, t2;
+	std::cout<<"\nSTL_fill: \n";
+
+	std::vector<float> vA(LENGTH);
+
+	QueryPerformanceCounter(&t1);
+
+	std::fill(vA.begin(), vA.end(), 1.f);
+
+	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+
+	std::cout<<"\nmemset: \n";
+
+	QueryPerformanceCounter(&t1);
+
+	memset(&vA[0], 0, vA.size()*sizeof(float));
+
+	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+
 }
 
 #endif
