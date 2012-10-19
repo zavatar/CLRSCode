@@ -27,6 +27,9 @@
     <ClInclude Include="ProgrammingPearls.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ModernC++.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

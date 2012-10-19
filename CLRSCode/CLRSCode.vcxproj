@@ -50,6 +50,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>H:\openSource\Boost\boost_1_51_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -77,6 +78,7 @@
     <ClInclude Include="Benchmarks.h" />
     <ClInclude Include="Exercises.h" />
     <ClInclude Include="Introduction2Algorithms.h" />
+    <ClInclude Include="ModernC++.h" />
     <ClInclude Include="ProgrammingPearls.h" />
   </ItemGroup>
   <ItemGroup>
