@@ -15,6 +15,7 @@
 #include "Introduction2Algorithms.h"
 #include "Exercises.h"
 #include "ProgrammingPearls.h"
+#include "ModernC++.h"
 
 #include <iostream>
 #include <ctime>
@@ -458,6 +459,99 @@ void memset_fill_Benchmark(int LENGTH)
 	memset(&vA[0], 0, vA.size()*sizeof(float));
 
 	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+
+}
+
+namespace mc {
+
+	namespace Private {
+
+		template <class T> 
+		struct Holder 
+		{ 
+			T value_; 
+		}; 
+
+		class BBase {};
+		class Window {};
+		class Button {};
+		class ScrollBar {};
+
+		template <class T, class Base> 
+		class EventHandler : public Base 
+		{ 
+		public: 
+			virtual void OnEvent(T& obj, int eventId); 
+		};
+
+	}
+
+void Typelist_Benchmark()
+{
+	typedef Loki::TL::MakeTypelist<bool, char, int, float, double>::Result MyTypelist;
+
+	typedef Loki::TL::Reverse<MyTypelist>::Result MyTypelistReversed;
+
+	typedef Loki::TL::Append<MyTypelist, MyTypelistReversed>::Result MyTypelistSymmetrical;
+
+	std::cout << Loki::TL::Length<MyTypelistReversed>::value << std::endl;
+
+	std::cout << Loki::TL::IndexOf<MyTypelistSymmetrical, float>::value << std::endl <<
+		typeid(Loki::TL::TypeAt<MyTypelistSymmetrical, 6>::Result).name() << std::endl;
+
+	// 3.13.1 Generating Scattered Hierarchies
+	typedef Loki::GenScatterHierarchy
+		<
+		Loki::TL::MakeTypelist
+			<
+			bool,
+			char,
+			int
+			>::Result,
+		Private::Holder
+		>
+		MyScatterHierarchy;
+	// 3*4
+	std::cout << sizeof(MyScatterHierarchy) << std::endl;
+
+	// ambiguity
+// 	Loki::GenScatterHierarchy
+// 		<
+// 		MyTypelistSymmetrical,
+// 		Private::Holder
+// 		> ma0;
+// 	Loki::Field<int>(ma0);
+// 
+// 	Loki::Tuple<MyTypelistSymmetrical> ma1;
+// 	Loki::Field<int>(ma1);
+
+	// 3.13.2 Generating Tuples
+	typedef Loki::Tuple<MyTypelist> MyTuple;
+	MyTuple mt;
+	Loki::Field<0>(mt) = true;
+	Loki::Field<1>(mt) = 'A';
+	Loki::Field<2>(mt) = 256;
+	Loki::Field<3>(mt) = 1.f;
+
+
+	// 3.13.3 Generating Linear Hierarchies
+	typedef Loki::GenLinearHierarchy
+		< 
+		Loki::TL::MakeTypelist
+			<
+			Private::Window,
+			Private::Button,
+			Private::ScrollBar
+			>::Result,
+		Private::EventHandler,
+		Private::BBase
+		> 
+		MyEventHandler;
+	// 1*4
+	std::cout << sizeof(MyEventHandler) << std::endl;
+
+
+}
 
 }
 

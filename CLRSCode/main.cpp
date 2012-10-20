@@ -10,7 +10,6 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "Benchmarks.h"
-#include "ModernC++.h"
 
 int main ()
 {
@@ -50,6 +49,8 @@ int main ()
 // Temp
 
 	memset_fill_Benchmark(LENGTH);
+
+	mc::Typelist_Benchmark();
 
 	return 0;
 }

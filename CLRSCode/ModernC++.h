@@ -14,6 +14,9 @@
 
 #include <cassert>
 #include <boost/static_assert.hpp>
+#include <loki/static_check.h>
+#include <loki/Typelist.h>
+#include <loki/HierarchyGenerators.h>
 
 namespace mc {
 
@@ -25,6 +28,8 @@ namespace mc {
 	BOOST_STATIC_ASSERT(true);
 	// C++11
 	static_assert(true, "Msg");
+	// Loki Error?
+	//LOKI_STATIC_CHECK(true, "Msg");
 	
 	// 2.3 Local Classes
 	class Interface 
@@ -96,6 +101,9 @@ namespace mc {
 #define SUPERSUBCLASS_STRICT(T, U) \
 		(SUPERSUBCLASS(T, U) && \
 		!::mc::Conversion<const T, const U>::sameType)
+
+	
+
 }
 
 #endif
