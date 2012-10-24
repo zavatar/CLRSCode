@@ -9,13 +9,16 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
+// Macros Setup
+//#define MCXX11
+
 #include "Benchmarks.h"
 
 int main ()
 {
-	const bool ISPRINT(false);
-	const int LENGTH(1<<20); // (1<<20) 1MB, (1<<16) 64KB
-	const float CNT(-.5f);
+// 	const bool ISPRINT(false);
+// 	const int LENGTH(1<<20); // (1<<20) 1MB, (1<<16) 64KB
+// 	const float CNT(-.5f);
 
 // 	clrs::INSERTION_SORT_Benchmark<ISPRINT>(LENGTH);
 // 	pp::isort_Benchmark<ISPRINT, 3>(LENGTH);
@@ -48,9 +51,11 @@ int main ()
 
 // Temp
 
-	memset_fill_Benchmark(LENGTH);
+//	memset_fill_Benchmark(LENGTH);
 
-	mc::Typelist_Benchmark();
+//	mc::Typelist_Benchmark();
+
+	//mc::Functor_Benchmark();
 
 	return 0;
 }

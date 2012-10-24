@@ -16,9 +16,13 @@
 #include <boost/static_assert.hpp>
 #include <loki/static_check.h>
 #include <loki/Typelist.h>
+#include <loki/TypelistMacros.h>
 #include <loki/HierarchyGenerators.h>
+#include <loki/SmallObj.h>
+#include <loki/Functor.h>
 
 namespace mc {
+
 
 // Chapter 1. Policy-Based Class Design
 
@@ -26,8 +30,10 @@ namespace mc {
 
 	// 2.1 Compile-Time Assertions
 	BOOST_STATIC_ASSERT(true);
+#ifdef MCXX11
 	// C++11
 	static_assert(true, "Msg");
+#endif
 	// Loki Error?
 	//LOKI_STATIC_CHECK(true, "Msg");
 	

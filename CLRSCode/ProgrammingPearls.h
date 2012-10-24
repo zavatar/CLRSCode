@@ -13,6 +13,7 @@
 #define PgrogrammingPearls_H
 
 #include "Introduction2Algorithms.h"
+#include <algorithm>
 
 namespace pp {
 
