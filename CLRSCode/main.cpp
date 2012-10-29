@@ -55,7 +55,9 @@ int main ()
 
 //	mc::Typelist_Benchmark();
 
-	//mc::Functor_Benchmark();
+//	mc::Functor_Benchmark();
+
+	pf::SAXPY();
 
 	return 0;
 }

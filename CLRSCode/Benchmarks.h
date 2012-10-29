@@ -16,6 +16,7 @@
 #include "Exercises.h"
 #include "ProgrammingPearls.h"
 #include "ModernC++.h"
+#include "ParallelForall.h"
 
 #include <iostream>
 #include <ctime>
