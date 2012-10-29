@@ -43,5 +43,8 @@
     <CudaCompile Include="ParallelForall.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
+    <CudaCompile Include="ThrustBenchmarks.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

@@ -18,20 +18,13 @@
 #include "ModernC++.h"
 #include "ParallelForall.h"
 
+#include <thrust/version.h>
+
 #include <iostream>
 #include <ctime>
 #include <vector>
 #include <algorithm>
 #include <windows.h>
-
-namespace {
-
-void PRINT(float *A, int A_length)
-{
-	for (int i(0); i < A_length; i++)
-		std::cout << A[i] << ' ';
-	std::cout << std::endl;
-}
 
 void ELAPSEDTIME(LARGE_INTEGER t1, LARGE_INTEGER t2)
 {
@@ -42,6 +35,15 @@ void ELAPSEDTIME(LARGE_INTEGER t1, LARGE_INTEGER t2)
 
 	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
 	std::cout << elapsedTime << " ms.\n";
+}
+
+namespace {
+
+void PRINT(float *A, int A_length)
+{
+	for (int i(0); i < A_length; i++)
+		std::cout << A[i] << ' ';
+	std::cout << std::endl;
 }
 
 template <bool ISPRINT>
@@ -165,6 +167,8 @@ void STL_sort_Benchmark(int LENGTH)
 
 	ASSERTSORTED<ISPRINT>(&vA[0], LENGTH);
 }
+
+void Thrust_sort_Benchmark(int LENGTH);
 
 template <int WHICH>
 void BINARY_SEARCH_Benchmark(int LENGTH)

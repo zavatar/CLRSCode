@@ -16,9 +16,15 @@
 
 int main ()
 {
-// 	const bool ISPRINT(false);
-// 	const int LENGTH(1<<20); // (1<<20) 1MB, (1<<16) 64KB
-// 	const float CNT(-.5f);
+
+	int major = THRUST_MAJOR_VERSION;
+	int minor = THRUST_MINOR_VERSION;
+
+	std::cout << "Thrust v" << major << "." << minor << std::endl;
+
+	const bool ISPRINT(false);
+	const int LENGTH(32<<20); // (1<<20) 1MB, (1<<16) 64KB
+	const float CNT(-.5f);
 
 // 	clrs::INSERTION_SORT_Benchmark<ISPRINT>(LENGTH);
 // 	pp::isort_Benchmark<ISPRINT, 3>(LENGTH);
@@ -32,7 +38,9 @@ int main ()
 // 	clrs::HEAPSORT_Benchmark<ISPRINT>(LENGTH);
 // 	clrs::STL_sort_heap_Benchmark<ISPRINT>(LENGTH);
 // 
-// 	clrs::STL_sort_Benchmark<ISPRINT>(LENGTH);
+ 	clrs::STL_sort_Benchmark<ISPRINT>(LENGTH);
+
+	clrs::Thrust_sort_Benchmark(LENGTH);
 // 
 // 	clrs::BINARY_SEARCH_Benchmark<1>(LENGTH);
 // 	clrs::BINARY_SEARCH_Benchmark<2>(LENGTH);
@@ -57,7 +65,7 @@ int main ()
 
 //	mc::Functor_Benchmark();
 
-	pf::SAXPY();
+//	pf::SAXPY();
 
 	return 0;
 }
