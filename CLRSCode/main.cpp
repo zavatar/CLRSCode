@@ -17,6 +17,8 @@
 int main ()
 {
 
+	cuda::InitDev();
+
 	int major = THRUST_MAJOR_VERSION;
 	int minor = THRUST_MINOR_VERSION;
 

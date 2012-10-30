@@ -51,7 +51,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>H:\openSource\Loki\loki-0.1.7\include;H:\openSource\Boost\boost_1_51_0;H:\openSource\thrust\thrust\thrust;$(CudaToolkitIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>H:\openSource\Loki\loki-0.1.7\include;H:\openSource\Boost\boost_1_51_0;H:\openSource\thrust\thrust\thrust;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -69,7 +69,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>H:\openSource\Loki\loki-0.1.7\include;H:\openSource\Boost\boost_1_51_0;H:\openSource\thrust\thrust\thrust;$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>H:\openSource\Loki\loki-0.1.7\include;H:\openSource\Boost\boost_1_51_0;H:\openSource\thrust\thrust\thrust</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -82,6 +82,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Benchmarks.h" />
+    <ClInclude Include="CudaExt.h" />
     <ClInclude Include="Exercises.h" />
     <ClInclude Include="Introduction2Algorithms.h" />
     <ClInclude Include="ModernC++.h" />
@@ -89,6 +90,7 @@
     <ClInclude Include="ProgrammingPearls.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CudaExt.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

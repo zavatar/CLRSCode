@@ -168,6 +168,7 @@ void STL_sort_Benchmark(int LENGTH)
 	ASSERTSORTED<ISPRINT>(&vA[0], LENGTH);
 }
 
+// How to support Template Declaration.
 void Thrust_sort_Benchmark(int LENGTH);
 
 template <int WHICH>

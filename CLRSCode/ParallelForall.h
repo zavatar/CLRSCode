@@ -15,8 +15,7 @@
 #ifndef ParallelForall_H
 #define ParallelForall_H
 
-#include <stdio.h>
-#include <cuda_runtime.h>
+#include "CudaExt.h"
 
 namespace pf {
 

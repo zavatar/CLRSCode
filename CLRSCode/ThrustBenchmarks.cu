@@ -9,7 +9,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include <device_launch_parameters.h>
+#include "CudaExt.h"
 
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
@@ -17,16 +17,11 @@
 #include <thrust/sort.h>
 #include <thrust/copy.h>
 
-#include <iostream>
-#include <ctime>
-#include <vector>
-#include <algorithm>
 #include <windows.h>
 
-void ELAPSEDTIME(LARGE_INTEGER t1, LARGE_INTEGER t2);
+void ELAPSEDTIME(LARGE_INTEGER, LARGE_INTEGER);
 
 namespace clrs {
-
 
 void Thrust_sort_Benchmark(int LENGTH)
 {
@@ -38,6 +33,9 @@ void Thrust_sort_Benchmark(int LENGTH)
 
 	QueryPerformanceCounter(&t1);
 
+	cuda::Timer timer;
+	timer.run();
+
 	// transfer data to the device
 	thrust::device_vector<float> d_vec = h_vec;
 
@@ -47,9 +45,10 @@ void Thrust_sort_Benchmark(int LENGTH)
 	// transfer data back to host
 	thrust::copy(d_vec.begin(), d_vec.end(), h_vec.begin());
 
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+	timer.stop();
+	timer.print();
 
-	//ASSERTSORTED<ISPRINT>(&vA[0], LENGTH);
+	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
 }
 
 }
