@@ -12,689 +12,241 @@
 #ifndef Benchmarks_H
 #define Benchmarks_H
 
-#include "Introduction2Algorithms.h"
-#include "Exercises.h"
-#include "ProgrammingPearls.h"
-#include "ModernC++.h"
-#include "ParallelForall.h"
-
-#include <thrust/version.h>
-
 #include <iostream>
-#include <ctime>
-#include <vector>
 #include <algorithm>
 #include <windows.h>
 
-void ELAPSEDTIME(LARGE_INTEGER t1, LARGE_INTEGER t2)
-{
-	LARGE_INTEGER frequency;
-	double elapsedTime;
-
-	QueryPerformanceFrequency(&frequency);
-
-	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
-	std::cout << elapsedTime << " ms.\n";
-}
-
-namespace {
-
-void PRINT(float *A, int A_length)
-{
-	for (int i(0); i < A_length; i++)
-		std::cout << A[i] << ' ';
-	std::cout << std::endl;
-}
-
-template <bool ISPRINT>
-void RANDOMFILL(float *A, int A_length)
-{
-	srand( (unsigned int)time(NULL) );
-	for (int i(0); i < A_length; i++)
-		A[i] = (float)rand()/(float)RAND_MAX;
-	if (ISPRINT)
-		PRINT(A, A_length);
-}
-
-template <bool ISPRINT>
-void ARRAYADD(float *A, int A_length, float add)
-{
-	for (int i(0); i < A_length; i++)
-		A[i] += add;
-	if (ISPRINT)
-		PRINT(A, A_length);
-}
-
-template <bool ISPRINT>
-void ASSERTSORTED(float *A, int A_length)
-{
-	for (int i(0); i < A_length-1; i++)
-		if (A[i] > A[i+1]) {
-			printf("Unsorted\n");
-			exit(-1);
-		}
-	if (ISPRINT)
-		PRINT(A, A_length);
-}
-
-} // namespace
-
-namespace clrs {
-
-template <bool ISPRINT>
-void INSERTION_SORT_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nINSERTION_SORT: \n"; 
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<ISPRINT>(A, LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	INSERTION_SORT(A, LENGTH);
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	ASSERTSORTED<ISPRINT>(A, LENGTH);
-	delete []A;
-}
-
-template <bool ISPRINT>
-void MERGE_SORT_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nMERGE_SORT: \n";
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<ISPRINT>(A, LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	MERGE_SORT(A, 0, LENGTH-1);
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	ASSERTSORTED<ISPRINT>(A, LENGTH);
-	delete []A;
-}
-
-template <bool ISPRINT, int WHICH>
-void QUICKSORT_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nQUICKSORT (" << WHICH << "): \n"; 
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<ISPRINT>(A, LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	// You could try three QuickSort codes
-	switch (WHICH)
-	{
-	case 2:
-		RANDOMIZED_QUICKSORT(A, 0, LENGTH-1);
-		break;
-	case 3:
-		TAIL_RECURSIVE_QUICKSORT(A, 0, LENGTH-1);
-		break;
-	case 1:
-	default:
-		QUICKSORT(A, 0, LENGTH-1);
-	}
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	ASSERTSORTED<ISPRINT>(A, LENGTH);
-	delete []A;
-}
-
-template <bool ISPRINT>
-void STL_sort_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nSTL_sort: \n";
-
-	std::vector<float> vA(LENGTH);
-	RANDOMFILL<ISPRINT>(&vA[0], LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	sort(vA.begin(), vA.end());
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	ASSERTSORTED<ISPRINT>(&vA[0], LENGTH);
-}
-
-// How to support Template Declaration.
-void Thrust_sort_Benchmark(int LENGTH);
-
-template <int WHICH>
-void BINARY_SEARCH_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout << "\nBINARY_SEARCH:  (" << WHICH << ")\n";
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<false>(A, LENGTH);
-
-	// Remember sort first
-	QUICKSORT(A, 0, LENGTH-1);
-
-	int Idx = int((float)rand()/(float)RAND_MAX*(LENGTH-1));
-	std::cout << "Idx = " << Idx << std::endl;
-	QueryPerformanceCounter(&t1);
-
-	int idx;
-	switch (WHICH)
-	{
-	case 2:
-		idx = RECURSIVE_BINARY_SEARCH(A, A[Idx], 0, LENGTH-1);
-		break;
-	case 1:
-	default:
-		idx = ITERATIVE_BINARY_SEARCH(A, A[Idx], 0, LENGTH-1);
-	}
-	
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-	std::cout << A[Idx] << "==" << A[idx] << std::endl;
-
-	delete []A;
-}
-
-template <int WHICH>
-void Exercise_3_3_7(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nExercise 2.3-7:  (" << WHICH << ")\n"; 
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<false>(A, LENGTH);
-
-	int Idx1 = int((float)rand()/(float)RAND_MAX*(LENGTH-1));
-	int Idx2 = int((float)rand()/(float)RAND_MAX*(LENGTH-1));
-	// if Idx1 == Idx2, then it may print No.
-	std::cout << "Pair: <" << Idx1 << ',' << Idx2 << ">" << std::endl;
-
-	// you can set sum1 = -1 to compare (1) and (2)
-	float sum1 = A[Idx1]+A[Idx2];
-	float sum2;
-	QueryPerformanceCounter(&t1);
-
-	switch (WHICH)
-	{
-	case 2:
-		sum2 = sum_exist2(A, sum1, LENGTH);
-		break;
-	case 1:
-	default:
-		sum2 = sum_exist1(A, sum1, LENGTH);
-	}
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-	std::cout << sum1 << "==" << sum2 << std::endl;
-
-	delete []A;
-}
-
-template <bool ISPRINT>
-void FIND_MAXIMUM_SUBARRAY_Benchmark(int LENGTH, float cnt)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nFIND_MAXIMUM_SUBARRAY: \n"; 
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<false>(A, LENGTH);
-	ARRAYADD<ISPRINT>(A, LENGTH, cnt);
-
-	int left, right;
-	QueryPerformanceCounter(&t1);
-
-	float sum = FIND_MAXIMUM_SUBARRAY(A, 0, LENGTH-1, left, right);
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-	std::cout << "Maxsum: " << sum << ", in (" << left << "," << right << ")"<< std::endl;
-
-	delete []A;
-}
-
-template <bool ISPRINT>
-void Exercise_4_1_4(int LENGTH, float cnt)
-{
-	std::cout<<"\nExercise 4.1-4:"; 
-	pp::maxsum_Benchmark<ISPRINT, 3>(LENGTH, cnt);
-}
-
-template <bool ISPRINT>
-void Exercise_4_1_5(int LENGTH, float cnt)
-{
-	std::cout<<"\nExercise 4.1-5:"; 
-	pp::maxsum_Benchmark<ISPRINT, 4>(LENGTH, cnt);
-}
-
-template <bool ISPRINT>
-void HEAPSORT_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nHEAPSORT: \n";
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<ISPRINT>(A, LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	HEAPSORT(A, LENGTH);
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	ASSERTSORTED<ISPRINT>(A, LENGTH);
-	delete []A;
-}
-
-template <bool ISPRINT>
-void STL_sort_heap_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nSTL_sort_heap: \n";
-
-	std::vector<float> vA(LENGTH);
-	RANDOMFILL<ISPRINT>(&vA[0], LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	std::make_heap(vA.begin(), vA.end());
-	std::sort_heap(vA.begin(), vA.end());
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	ASSERTSORTED<ISPRINT>(&vA[0], LENGTH);
-}
-
-} // namespace
-
-namespace pp {
-
-template <bool ISPRINT>
-void maxsum3_Benchmark(int LENGTH, float cnt)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nmaxsum3: \n"; 
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<false>(A, LENGTH);
-	ARRAYADD<ISPRINT>(A, LENGTH, cnt);
-
-	int left, right;
-	QueryPerformanceCounter(&t1);
-
-	float sum = maxsum3(A, 0, LENGTH, left, right);
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-	std::cout << "Maxsum: " << sum << ", in (" << left << "," << right << ")"<< std::endl;
-
-	delete []A;
-}
-
-template <bool ISPRINT, int WHICH>
-void maxsum_Benchmark(int LENGTH, float cnt)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nmaxsum: (" << WHICH << ")\n"; 
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<false>(A, LENGTH);
-	ARRAYADD<ISPRINT>(A, LENGTH, cnt);
-
-	int left, right;
-	QueryPerformanceCounter(&t1);
-
-	float sum;
-	switch (WHICH)
-	{
-	case 3:
-		sum = maxsum3(A, 0, LENGTH-1, left, right);
-		break;
-	case 4:
-		sum = maxsum4(A, LENGTH, left, right);
-		break;
-	default:
-		sum = 0;
-		std::cout << "Has not been Realized...";
-	}
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-	std::cout << "Maxsum: " << sum << ", in (" << left << "," << right << ")"<< std::endl;
-
-	delete []A;
-}
-
-template <bool ISPRINT, int WHICH>
-void isort_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nisort: (" << WHICH << ")\n"; 
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<ISPRINT>(A, LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	switch (WHICH)
-	{
-	case 1:
-		isort1(A, LENGTH);
-		break;
-	case 2:
-		isort2(A, LENGTH);
-		break;
-	case 3:
-		isort3(A, LENGTH);
-		break;
-	default:
-		std::cout << "Has not been Realized...";
-	}
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	ASSERTSORTED<ISPRINT>(A, LENGTH);
-	delete []A;
-}
-
-template <bool ISPRINT, int WHICH>
-void Problems9_5_4(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nProblems9_5_4: (" << WHICH << ")\n";
-
-	float *A = new float[LENGTH];
-	RANDOMFILL<ISPRINT>(A, LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	float maximum;
-	switch (WHICH)
-	{
-	case 1:
-		maximum = arrmax(A, LENGTH);
-		break;
-	case 2:
-		maximum = arrmaxMacro(A, LENGTH);
-		break;
-	default:
-		maximum = 0;
-		std::cout << "Has not been Realized...";
-	}
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	switch (WHICH)
-	{
-	case 1:
-		std::cout << "Inline Maximum: " << maximum << std::endl;
-		break;
-	case 2:
-		std::cout << "Macro Maximum: " << maximum << std::endl;
-		break;
-	}
-
-	delete []A;
-}
-
-} // namespace
-
-// Temp
-void memset_fill_Benchmark(int LENGTH)
-{
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nSTL_fill: \n";
-
-	std::vector<float> vA(LENGTH);
-
-	QueryPerformanceCounter(&t1);
-
-	std::fill(vA.begin(), vA.end(), 1.f);
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-	std::cout<<"\nmemset: \n";
-
-	QueryPerformanceCounter(&t1);
-
-	memset(&vA[0], 0, vA.size()*sizeof(float));
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
-
-}
-
-namespace mc {
-
-	namespace TlPrivate {
-#ifdef MCXX11
-		// C++11, need compiling with g++ -std=c++0x
-		template<typename T>  
-		void output(T&& value)  
-		{  
-			std::cout << value << std::endl;
-		}
-		template<typename First, typename... Rest>  
-		void output(First&& first, Rest&&... rest)  
-		{  
-			std::cout << first << ",";
-			output(std::forward<Rest>(rest)...);
-		}
-		template<typename T>  
-		T sum(T&& value)  
-		{  
-			return value;  
-		}  
-		template<typename First, typename Second, typename... Rest>  
-		First sum(First&& first, Second&& second, Rest&&... rest)  
-		{  
-			return sum(first + second, std::forward<Rest>(rest)...);  
-		}
+#ifdef min
+#undef min
 #endif
-		template <class T> 
-		struct Holder 
-		{
-			//#pragma message("Holder")
-			T value_;
-		}; 
-
-		class BBase {};
-		class Window {};
-		class Button {};
-		class ScrollBar {};
-
-		template <class T, class Base> 
-		class EventHandler : public Base 
-		{ 
-		public: 
-			virtual void OnEvent(T& obj, int eventId); 
-		};
-
-	}
-
-void Typelist_Benchmark()
-{
-#ifdef MCXX11
-	// C++11, need compiling with g++ -std=c++0x
-	double d = 2.3;  
-	TlPrivate::output(42,"hello",d,'a');  
-	TlPrivate::output("hello",d,'a');  
-	TlPrivate::output(d,'a');  
-	TlPrivate::output('a');  
-	TlPrivate::output(TlPrivate::sum(1), TlPrivate::sum(1, 2), TlPrivate::sum(1, 2, 3));
+#ifdef max
+#undef max
 #endif
-	typedef Loki::TL::MakeTypelist<bool, char, int, float, double>::Result MyTypelist;
 
-	typedef Loki::TL::Reverse<MyTypelist>::Result MyTypelistReversed;
+namespace bm {
 
-	typedef Loki::TL::Append<MyTypelist, MyTypelistReversed>::Result MyTypelistSymmetrical;
+typedef float Type;
 
-	std::cout << Loki::TL::Length<MyTypelistReversed>::value << std::endl;
+const bool ISPRINT(false);
+const int LENGTH(1<<20); // (1<<20) 1MB, (1<<16) 64KB
+const Type CNT(-.5f);
 
-	std::cout << Loki::TL::IndexOf<MyTypelistSymmetrical, float>::value << std::endl <<
-		typeid(Loki::TL::TypeAt<MyTypelistSymmetrical, 6>::Result).name() << std::endl;
-
-	// 3.13.1 Generating Scattered Hierarchies
-	typedef Loki::GenScatterHierarchy
-		<
-		Loki::TL::MakeTypelist
-			<
-			bool,
-			char,
-			int
-			>::Result,
-		TlPrivate::Holder
-		>
-		MyScatterHierarchy;
-	// 3*4
-	std::cout << sizeof(MyScatterHierarchy) << std::endl;
-
-	// Deal with ambiguity using NoDuplicates
-	Loki::GenScatterHierarchy
-		<
-			Loki::TL::NoDuplicates
-			<
-				Loki::TL::MakeTypelist
-				<
-					int,
-					int,
-					int
-				>::Result
-			>::Result,
-		TlPrivate::Holder
-		> ma0;
-	Loki::Field<int>(ma0);
-
-	Loki::Tuple<Loki::TL::NoDuplicates<MyTypelistSymmetrical>::Result> ma1;
-	Loki::Field<int>(ma1);
-
-	// 3.13.2 Generating Tuples
-	typedef Loki::Tuple<MyTypelist> MyTuple;
-	MyTuple mt;
-	Loki::Field<0>(mt) = true;
-	Loki::Field<1>(mt) = 'A';
-	Loki::Field<2>(mt) = 256;
-	Loki::Field<3>(mt) = 1.f;
-
-
-	// 3.13.3 Generating Linear Hierarchies
-	typedef Loki::GenLinearHierarchy
-		< 
-		Loki::TL::MakeTypelist
-			<
-			TlPrivate::Window,
-			TlPrivate::Button,
-			TlPrivate::ScrollBar
-			>::Result,
-		TlPrivate::EventHandler,
-		TlPrivate::BBase
-		> 
-		MyEventHandler;
-	// 1*4
-	std::cout << sizeof(MyEventHandler) << std::endl;
+template <typename T>
+void _sort(void(*fun)(T*, T*), T*A, int N)
+{
+	fun(A, A+N);
 }
 
-	namespace FunPrivate {
+template <typename T>
+void _sort(void(*fun)(T*, int), T *A, int N)
+{
+	fun(A, N);
+}
 
-		void TestFunction(int);
-		void TestFunction(int i, double d)
-		{
-			std::cout << "TestFunction(" << i 
-				<< ", " << d << ") called.\n";
-		}
+template <typename T>
+void _sort(void(*fun)(T*, int, int), T *A, int N)
+{
+	fun(A, 0, N-1);
+}
 
-		struct TestFunctor
-		{
-			void operator()(int i, double d) 
-			{ 
-				std::cout << "TestFunctor::operator()(" << i 
-					<< ", " << d << ") called.\n"; 
-			}
-		};
+template <typename T>
+int _search(int(*fun)(T*, T, int, int), T *A, T v, int N)
+{
+	return fun(A, v, 0, N-1);
+}
 
-		template <typename T>
-		class Functor
-		{
-		public:
-			// const is important
-			Functor(const T& fun) : _f(fun) {}
+template <typename T>
+T _maxsum(T(*fun)(T*, int, int, int&, int&), T *A, int N, int &l, int &r)
+{
+	return fun(A, 0, N-1, l, r);
+}
 
-			void operator()(int i, double d)
-			{
-				_f(i, d);
-			}
+template <typename T>
+T _maxsum(T(*fun)(T*, int, int&, int&), T *A, int N, int &l, int &r)
+{
+	return fun(A, N, l, r);
+}
 
-		private:
-			T _f;
-		};
+template <typename T, int LENGTH = 1<<20, bool ISPRINT = false>
+class BenchMarks {
 
-		class Parrot 
-		{ 
-		public: 
-			void Eat() 
-			{ 
-				std::cout << "Tsk, knick, tsk...\n"; 
-			} 
-			void Speak() 
-			{ 
-				std::cout << "Oh Captain, my Captain!\n"; 
-			} 
-		};
+public:
 
+	BenchMarks() {
+		A = new T[LENGTH];
 	}
 
-void Functor_Benchmark()
-{
-// Loki::Functor
-	// Function
-	//Loki::Functor<void, LOKI_TYPELIST_2(int, double)> cmd1(FunPrivate::TestFunction);
-	//cmd1(4, 4.5);
-	// operate()
-	FunPrivate::TestFunctor f;
-	Loki::Functor<void, LOKI_TYPELIST_2(int, double)> cmd2(f);
-	cmd2(4, 4.5);
-	// Functor
-	Loki::Functor<void, LOKI_TYPELIST_2(int, double)> cmd3(cmd2);
-	cmd3(4, 4.5);
-// FunPrivate::Functor
-// 	// Function
-// 	FunPrivate::Functor<void(*)(int, double)> fun1(FunPrivate::TestFunction);
-// 	fun1(4, 4.5);
-	// operate()
-	FunPrivate::Functor<FunPrivate::TestFunctor> fun2(f);
-	fun2(4, 4.5);
-	// Functor
-	FunPrivate::Functor<FunPrivate::Functor<FunPrivate::TestFunctor>> fun3(fun2);
-	fun3(4, 4.5);
+	~BenchMarks() {
+		delete []A;
+	}
 
-	typedef void (*TpFun)(int, double);
-	// Method 1:
-	TpFun pF = FunPrivate::TestFunction;
-	Loki::Functor<void, LOKI_TYPELIST_2(int, double)> cmd4(pF);
-	cmd4(4, 4.5);
-	// Method 2:
-	Loki::Functor<void, LOKI_TYPELIST_2(int, double)> cmd5(
-		static_cast<TpFun>(FunPrivate::TestFunction));
-	cmd5(4, 4.5);
+	template <class Fun>
+	void sort(Fun fun, const char* cout)
+	{
+		std::cout << cout;
 
-	typedef void (FunPrivate::Parrot::* TpMemFun)();
-	TpMemFun pActivity = &FunPrivate::Parrot::Eat;
-	FunPrivate::Parrot geronimo; 
-	FunPrivate::Parrot* pGeronimo = &geronimo;
-	(geronimo.*pActivity)(); 
-	(pGeronimo->*pActivity)();
-	pActivity = &FunPrivate::Parrot::Speak;
-	(geronimo.*pActivity)();
+		randomFill(A, A+LENGTH);
 
-	Loki::Functor<> cmd6(&geronimo, &FunPrivate::Parrot::Eat),
-		cmd7(&geronimo, &FunPrivate::Parrot::Speak);
-	cmd6();
-	cmd7();
-}
+		QueryPerformanceCounter(&t1);
+
+		_sort(fun, A, LENGTH);
+
+		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+
+		assertSorted(A, A+LENGTH);
+	}
+
+	template <class Fun>
+	void search(Fun fun, const char* cout)
+	{
+		std::cout << cout;
+
+		randomFill(A, A+LENGTH);
+
+		// Remember sort first
+		std::sort(A, A+LENGTH);
+
+		int Idx = int(_rand<T>()*(LENGTH-1));
+		std::cout << "Idx = " << Idx << std::endl;
+
+		QueryPerformanceCounter(&t1);
+
+		int idx = _search(fun, A, A[Idx], LENGTH);
+
+		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+
+		std::cout << A[Idx] << "==" << A[idx] << std::endl;
+	}
+
+	template <class Fun>
+	void sum_exist(Fun fun, const char* cout)
+	{
+		std::cout << cout;
+
+		randomFill(A, A+LENGTH);
+
+		int Idx1 = int(_rand<T>()*(LENGTH-1));
+		int Idx2 = int(_rand<T>()*(LENGTH-1));
+		// if Idx1 == Idx2, then it may print No.
+		std::cout << "Pair: <" << Idx1 << ',' << Idx2 << ">" << std::endl;
+
+		// you can set sum1 = -1 to compare (sum_exist1) and (sum_exist2)
+		T sum1 = A[Idx1]+A[Idx2];
+
+		QueryPerformanceCounter(&t1);
+
+		T sum2 = fun(A, sum1, LENGTH);
+
+		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+
+		std::cout << sum1 << "==" << sum2 << std::endl;
+	}
+
+	template <class Fun>
+	void maxsum(Fun fun, T cnt, const char* cout)
+	{
+		std::cout << cout;
+
+		randomFill(A, A+LENGTH);
+
+		arrayAdd(A, A+LENGTH, cnt);
+
+		int left, right;
+		QueryPerformanceCounter(&t1);
+
+		T sum = _maxsum(fun, A, LENGTH, left, right);
+
+		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+
+		std::cout << "Maxsum: " << sum << ", in (" << left << "," << right << ")"<< std::endl;
+	}
+
+	template <class Fun>
+	void arrmax(Fun fun, const char* cout)
+	{
+		std::cout << cout;
+
+		randomFill(A, A+LENGTH);
+
+		QueryPerformanceCounter(&t1);
+
+		T maximum = fun(A, LENGTH);
+
+		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+
+		std::cout << "Maximum: " << maximum << std::endl;
+	}
+
+private:
+
+	LARGE_INTEGER t1, t2;
+	T *A;
+
+	void elapsedTime(LARGE_INTEGER t1, LARGE_INTEGER t2)
+	{
+		LARGE_INTEGER frequency;
+		double elapsedTime;
+
+		QueryPerformanceFrequency(&frequency);
+
+		elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
+		std::cout << elapsedTime << " ms.\n";
+	}
+
+	void print(T *l, T *r)
+	{
+		for (int i(0); i < r-l; i++)
+			std::cout << l[i] << ' ';
+		std::cout << std::endl;
+	}
+
+	template <typename T>
+	T _rand();
+
+	template <>
+	float _rand<float>() {
+		return (float)rand()/(float)RAND_MAX;
+	}
+
+	template <>
+	int _rand<int>() {
+		return rand();
+	}
+
+	template <>
+	char _rand<char>() {
+		return char(rand());
+	}
+
+	void randomFill(T *l, T *r)
+	{
+		srand( (unsigned int)time(NULL) );
+		for (int i(0); i < r-l; i++)
+			l[i] = _rand<T>();
+		if (ISPRINT)
+			print(l, r);
+	}
+
+	void arrayAdd(T *l, T *r, T add)
+	{
+		for (int i(0); i < r-l; i++)
+			l[i] += add;
+		if (ISPRINT)
+			print(l, r);
+	}
+
+	void assertSorted(T *l, T *r)
+	{
+		if (ISPRINT)
+			print(l, r);
+		for (int i(0); i < r-l-1; i++)
+			if (l[i] > l[i+1]) {
+				printf("Unsorted\n");
+				exit(-1);
+			}
+	}
+
+};
 
 }
 

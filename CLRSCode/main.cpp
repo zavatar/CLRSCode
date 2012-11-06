@@ -14,6 +14,19 @@
 
 #include "Benchmarks.h"
 
+#include "Introduction2Algorithms.h"
+#include "ProgrammingPearls.h"
+#include "Exercises.h"
+#include "ModernC++.h"
+#include "ParallelForall.h"
+
+#include <thrust/version.h>
+
+#include <ctime>
+#include <vector>
+
+void cudaMain();
+
 int main ()
 {
 
@@ -24,50 +37,50 @@ int main ()
 
 	std::cout << "Thrust v" << major << "." << minor << std::endl;
 
-	const bool ISPRINT(false);
-	const int LENGTH(32<<20); // (1<<20) 1MB, (1<<16) 64KB
-	const float CNT(-.5f);
+	typedef bm::Type Type;
 
-// 	clrs::INSERTION_SORT_Benchmark<ISPRINT>(LENGTH);
-// 	pp::isort_Benchmark<ISPRINT, 3>(LENGTH);
+	bm::BenchMarks<Type, bm::LENGTH, bm::ISPRINT> benchmarks;
 
-// 	clrs::MERGE_SORT_Benchmark<ISPRINT>(LENGTH);
+// 	benchmarks.sort(clrs::INSERTION_SORT<Type>, "\nINSERTION_SORT: \n");
 // 
-// 	clrs::QUICKSORT_Benchmark<ISPRINT, 1>(LENGTH);
-// 	clrs::QUICKSORT_Benchmark<ISPRINT, 2>(LENGTH);
-// 	clrs::QUICKSORT_Benchmark<ISPRINT, 3>(LENGTH);
+// 	benchmarks.sort(pp::isort3<Type>, "\nisort3: \n");
 // 
-// 	clrs::HEAPSORT_Benchmark<ISPRINT>(LENGTH);
-// 	clrs::STL_sort_heap_Benchmark<ISPRINT>(LENGTH);
+// 	benchmarks.sort(clrs::MERGE_SORT<Type>, "\nMERGE_SORT: \n");
 // 
- 	clrs::STL_sort_Benchmark<ISPRINT>(LENGTH);
-
-	clrs::Thrust_sort_Benchmark(LENGTH);
+ 	benchmarks.sort(std::sort<Type*>, "\nSTL_sort: \n");
 // 
-// 	clrs::BINARY_SEARCH_Benchmark<1>(LENGTH);
-// 	clrs::BINARY_SEARCH_Benchmark<2>(LENGTH);
+// 	benchmarks.sort(clrs::QUICKSORT<Type>, "\nQUICKSORT : \n");
 // 
-// 	clrs::Exercise_3_3_7<1>(LENGTH);
-// 	clrs::Exercise_3_3_7<2>(LENGTH);
+// 	benchmarks.sort(clrs::HEAPSORT<Type>, "\nHEAPSORT: \n");
+// 	
+// 	benchmarks.sort(clrs::STL_heap_sort<Type*>, "\nSTL_sort_heap: \n");
+//
+//	benchmarks.search(clrs::ITERATIVE_BINARY_SEARCH<Type>, "\nBINARY_SEARCH: \n");
+//
+	cudaMain();
+// 
+// 	benchmarks.sum_exist(clrs::Exercise_3_3_7<Type>, "\nExercise 2.3-7: \n");
+// 
+// 	benchmarks.maxsum(clrs::FIND_MAXIMUM_SUBARRAY<Type>, bm::CNT,
+// 		"\nFIND_MAXIMUM_SUBARRAY: \n");
+// 
+// 	benchmarks.maxsum(pp::maxsum3<Type>, bm::CNT, "\nmaxsum3: \n");
+// 	benchmarks.maxsum(clrs::FIND_MAXIMUM_SUBARRAY_DAC<Type>, bm::CNT,
+// 		"\nFIND_MAXIMUM_SUBARRAY_DAC: \n");
+// 
+// 	benchmarks.maxsum(pp::maxsum4<Type>, bm::CNT, "\nmaxsum4: \n");
+// 	benchmarks.maxsum(clrs::FIND_MAXIMUM_SUBARRAY_SCAN<Type>, bm::CNT,
+// 		"\nFIND_MAXIMUM_SUBARRAY_SCAN: \n");
+// 
+// 	// pp->Problems9_5_4, suggest LENGTH = 1<<5
+// 	benchmarks.arrmax(pp::arrmax<Type>, "\nProblems9_5_4: (Inline)\n");
+// 	benchmarks.arrmax(pp::arrmaxMacro<Type>, "\nProblems9_5_4: (Macro)\n");
+// 
+// 	mc::Typelist_Benchmark();
+// 
+// 	mc::Functor_Benchmark();
 
-// 	clrs::FIND_MAXIMUM_SUBARRAY_Benchmark<ISPRINT>(LENGTH, CNT);
-// 	clrs::Exercise_4_1_4<ISPRINT>(LENGTH, CNT);
-// 	clrs::Exercise_4_1_5<ISPRINT>(LENGTH, CNT);
-// 	pp::maxsum_Benchmark<ISPRINT, 3>(LENGTH, CNT);
-// 	pp::maxsum_Benchmark<ISPRINT, 4>(LENGTH, CNT);
-
-// 	pp::Problems9_5_4<ISPRINT, 1>(LENGTH);
-// 	pp::Problems9_5_4<ISPRINT, 2>(LENGTH);
-
-// Temp
-
-//	memset_fill_Benchmark(LENGTH);
-
-//	mc::Typelist_Benchmark();
-
-//	mc::Functor_Benchmark();
-
-//	pf::SAXPY();
+	pf::SAXPY();
 
 	return 0;
 }

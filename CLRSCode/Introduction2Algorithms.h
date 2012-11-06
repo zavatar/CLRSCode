@@ -12,8 +12,8 @@
 #ifndef Introduction2Algorithms_H
 #define Introduction2Algorithms_H
 
-#include "ProgrammingPearls.h"
 #include <cfloat>
+#include <algorithm>
 
 namespace clrs {
 
@@ -284,6 +284,13 @@ void BUILD_MAX_HEAP(T *A, int A_heap_size)
 {
 	for (int i(A_heap_size/2-1); i >= 0; i--)
 		MAX_HEAPIFY(A, A_heap_size, i);
+}
+
+template <typename T>
+void STL_heap_sort(T l, T r)
+{
+	std::make_heap(l, r);
+	std::sort_heap(l, r);
 }
 
 template <typename T>

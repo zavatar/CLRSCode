@@ -9,6 +9,8 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
+#include "Benchmarks.h"
+
 #include "CudaExt.h"
 
 #include <thrust/host_vector.h>
@@ -17,38 +19,41 @@
 #include <thrust/sort.h>
 #include <thrust/copy.h>
 
-#include <windows.h>
+namespace mythrust{
 
-void ELAPSEDTIME(LARGE_INTEGER, LARGE_INTEGER);
-
-namespace clrs {
-
-void Thrust_sort_Benchmark(int LENGTH)
+template <typename T>
+void sortGPUtimer(T *l, T *r)
 {
-	LARGE_INTEGER t1, t2;
-	std::cout<<"\nThrust_sort: \n";
-
-	thrust::host_vector<float> h_vec(LENGTH);
-	std::generate(h_vec.begin(), h_vec.end(), rand);
-
-	QueryPerformanceCounter(&t1);
-
 	cuda::Timer timer;
-	timer.run();
+ 	timer.run();
 
+	sort(l, r);
+
+	timer.stop();
+ 	timer.print();
+}
+
+template <typename T>
+void sort(T *l, T *r)
+{
 	// transfer data to the device
-	thrust::device_vector<float> d_vec = h_vec;
+	thrust::device_vector<T> d_vec(l, r);
 
 	// sort data on the device (846M keys per second on GeForce GTX 480)
 	thrust::sort(d_vec.begin(), d_vec.end());
 
 	// transfer data back to host
-	thrust::copy(d_vec.begin(), d_vec.end(), h_vec.begin());
-
-	timer.stop();
-	timer.print();
-
-	QueryPerformanceCounter(&t2); ELAPSEDTIME(t1, t2);
+	thrust::copy(d_vec.begin(), d_vec.end(), l);
 }
+
+}
+
+void cudaMain()
+{
+	typedef bm::Type Type;
+
+	bm::BenchMarks<Type, bm::LENGTH, bm::ISPRINT> benchmarks;
+
+	benchmarks.sort(mythrust::sortGPUtimer<Type>, "\nThrust_sort: \n");
 
 }

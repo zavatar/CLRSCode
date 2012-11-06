@@ -13,6 +13,7 @@
 #define Exercises_H
 
 #include "Introduction2Algorithms.h"
+#include "ProgrammingPearls.h"
 
 namespace clrs {
 
@@ -24,7 +25,7 @@ template <typename T>
 T sum_exist1(T *A, T x, int A_length)
 {
 	int i(0), j(A_length-1);
-	QUICKSORT(A, 0, j);
+	std::sort(A, A+A_length);
 	while (i < j)
 	{
 		T sum = A[i]+A[j];
@@ -50,7 +51,7 @@ template <typename T>
 T sum_exist2(T *A, T x, int A_length)
 {
 	int i(0), r(A_length-1), j;
-	QUICKSORT(A, 0, r);
+	std::sort(A, A+A_length);
 	for (; i < r; i++)
 	{
 		T x_Ai = x - A[i];
@@ -65,6 +66,13 @@ T sum_exist2(T *A, T x, int A_length)
 		printf("NO\n");
 		return 0;
 	}
+}
+
+template <typename T>
+T Exercise_3_3_7(T *A, T x, int A_length)
+{
+	return sum_exist1(A, x, A_length);
+	//return sum_exist2(A, x, A_length);
 }
 
 // NOTE: Exercise 4.1-4, I am not sure.
