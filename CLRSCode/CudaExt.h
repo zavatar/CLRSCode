@@ -34,7 +34,7 @@ public:
 
 	void stop();
 
-	void print();
+	float print();
 
 	~Timer();
 

@@ -44,6 +44,9 @@
     <ClCompile Include="CudaExt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Multi-Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="ParallelForall.cu">
@@ -52,5 +55,10 @@
     <CudaCompile Include="ThrustBenchmarks.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <BSGP Include="BSGP.i">
+      <Filter>Source Files</Filter>
+    </BSGP>
   </ItemGroup>
 </Project>

@@ -30,7 +30,13 @@ void PrintProp(cudaDeviceProp prop, int dev) {
 	printf( " --- General Information for device %d ---\n", dev );
 	printf( "Name: %s\n", prop.name );
 	printf( "Compute capability: %d.%d\n", prop.major, prop.minor );
-	printf( "Clock rate: %d\n", prop.clockRate );
+	printf("  Clock rate: %d\n", prop.clockRate );
+	printf("  Memory Clock Rate (KHz): %d\n",
+		prop.memoryClockRate);
+	printf("  Memory Bus Width (bits): %d\n",
+		prop.memoryBusWidth);
+	printf("  Peak Memory Bandwidth (GB/s): %f\n",
+		2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
 	printf( "Device copy overlap: " );
 	if (prop.deviceOverlap)
 		printf( "Enabled\n" );
@@ -41,15 +47,15 @@ void PrintProp(cudaDeviceProp prop, int dev) {
 		printf( "Enabled\n" );
 	else
 		printf( "Disabled\n" );
-	printf( " --- Memory Information for device %d ---\n", dev );
-	printf( "Total global mem: %ld\n", prop.totalGlobalMem );
-	printf( "Total constant Mem: %ld\n", prop.totalConstMem );
-	printf( "Max mem pitch: %ld\n", prop.memPitch );
-	printf( "Texture Alignment: %ld\n", prop.textureAlignment );
-	printf( " --- MP Information for device %d ---\n", dev );
+	printf( "\n --- Memory Information for device %d ---\n", dev );
+	printf( "Total global mem: 0x%08x\n", prop.totalGlobalMem );
+	printf( "Total constant Mem: 0x%08x\n", prop.totalConstMem );
+	printf( "Max mem pitch: 0x%08x\n", prop.memPitch );
+	printf( "Texture Alignment: 0x%08x\n", prop.textureAlignment );
+	printf( "\n --- MP Information for device %d ---\n", dev );
 	printf( "Multiprocessor count: %d\n",
 		prop.multiProcessorCount );
-	printf( "Shared mem per mp: %ld\n", prop.sharedMemPerBlock );
+	printf( "Shared mem per mp: 0x%08x\n", prop.sharedMemPerBlock );
 	printf( "Registers per mp: %d\n", prop.regsPerBlock );
 	printf( "Threads in warp: %d\n", prop.warpSize );
 	printf( "Max threads per block: %d\n",
@@ -89,14 +95,15 @@ void Timer::run()
 void Timer::stop()
 {
 	SafeCall(cudaEventRecord(_stop, 0));
-	SafeCall(cudaEventSynchronize(_stop));
 }
 
-void Timer::print()
+float Timer::print()
 {
+	SafeCall(cudaEventSynchronize(_stop));
 	float elapsedTime;
 	SafeCall(cudaEventElapsedTime(&elapsedTime, _start, _stop));
 	printf("GPU Kernel Time: %.3f ms\n", elapsedTime);
+	return elapsedTime;
 }
 
 Timer::~Timer()

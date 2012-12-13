@@ -19,6 +19,7 @@
 #include "Exercises.h"
 #include "ModernC++.h"
 #include "ParallelForall.h"
+#include "BSGP.h"
 
 #include <thrust/version.h>
 
@@ -26,6 +27,8 @@
 #include <vector>
 
 void cudaMain();
+
+void producer_consumer();
 
 int main ()
 {
@@ -47,7 +50,7 @@ int main ()
 // 
 // 	benchmarks.sort(clrs::MERGE_SORT<Type>, "\nMERGE_SORT: \n");
 // 
- 	benchmarks.sort(std::sort<Type*>, "\nSTL_sort: \n");
+// 	benchmarks.sort(std::sort<Type*>, "\nSTL_sort: \n");
 // 
 // 	benchmarks.sort(clrs::QUICKSORT<Type>, "\nQUICKSORT : \n");
 // 
@@ -57,7 +60,7 @@ int main ()
 //
 //	benchmarks.search(clrs::ITERATIVE_BINARY_SEARCH<Type>, "\nBINARY_SEARCH: \n");
 //
-	cudaMain();
+//	cudaMain();
 // 
 // 	benchmarks.sum_exist(clrs::Exercise_3_3_7<Type>, "\nExercise 2.3-7: \n");
 // 
@@ -80,7 +83,12 @@ int main ()
 // 
 // 	mc::Functor_Benchmark();
 
-	pf::SAXPY();
+//	pf::SAXPY();
+
+//	producer_consumer();
+
+	BSGPmain();
+	system("pause");
 
 	return 0;
 }
