@@ -94,6 +94,7 @@
     <ClInclude Include="ModernC++.h" />
     <ClInclude Include="ParallelForall.h" />
     <ClInclude Include="ProgrammingPearls.h" />
+    <ClInclude Include="ThrustBenchmarks.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CudaExt.cpp" />

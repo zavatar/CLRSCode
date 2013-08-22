@@ -25,11 +25,9 @@
 
 namespace bm {
 
-typedef float Type;
-
 const bool ISPRINT(false);
-const int LENGTH(1<<20); // (1<<20) 1MB, (1<<16) 64KB
-const Type CNT(-.5f);
+const int LENGTH(1<<16); // (1<<20) 1MB, (1<<16) 64KB
+const float CNT(-.5f);
 
 template <typename T>
 void _sort(void(*fun)(T*, T*), T*A, int N)
@@ -67,17 +65,46 @@ T _maxsum(T(*fun)(T*, int, int&, int&), T *A, int N, int &l, int &r)
 	return fun(A, N, l, r);
 }
 
-template <typename T, int LENGTH = 1<<20, bool ISPRINT = false>
+class Timer {
+
+public:
+
+	Timer() {
+		QueryPerformanceFrequency(&frequency);
+	}
+
+	void run() {
+		QueryPerformanceCounter(&t1);
+	}
+
+	void stop() {
+		QueryPerformanceCounter(&t2);
+	}
+
+	float print() {
+		double elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
+		printf("CPU Time: %.3f ms\n", elapsedTime);
+		return float(elapsedTime);
+	}
+
+private:
+
+	LARGE_INTEGER t1, t2, frequency;
+};
+
+template <typename T, int LENGTH = bm::LENGTH, bool ISPRINT = bm::ISPRINT>
 class BenchMarks {
 
 public:
 
 	BenchMarks() {
 		A = new T[LENGTH];
+		B = new T[LENGTH];
 	}
 
 	~BenchMarks() {
 		delete []A;
+		delete []B;
 	}
 
 	template <class Fun>
@@ -87,11 +114,11 @@ public:
 
 		randomFill(A, A+LENGTH);
 
-		QueryPerformanceCounter(&t1);
+		_t.run();
 
 		_sort(fun, A, LENGTH);
 
-		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+		_t.stop(); _t.print();
 
 		assertSorted(A, A+LENGTH);
 	}
@@ -106,14 +133,14 @@ public:
 		// Remember sort first
 		std::sort(A, A+LENGTH);
 
-		int Idx = int(_rand<T>()*(LENGTH-1));
+		int Idx = int(_rand<float>()*(LENGTH-1));
 		std::cout << "Idx = " << Idx << std::endl;
 
-		QueryPerformanceCounter(&t1);
+		_t.run();
 
 		int idx = _search(fun, A, A[Idx], LENGTH);
 
-		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+		_t.stop(); _t.print();
 
 		std::cout << A[Idx] << "==" << A[idx] << std::endl;
 	}
@@ -125,19 +152,19 @@ public:
 
 		randomFill(A, A+LENGTH);
 
-		int Idx1 = int(_rand<T>()*(LENGTH-1));
-		int Idx2 = int(_rand<T>()*(LENGTH-1));
+		int Idx1 = int(_rand<float>()*(LENGTH-1));
+		int Idx2 = int(_rand<float>()*(LENGTH-1));
 		// if Idx1 == Idx2, then it may print No.
 		std::cout << "Pair: <" << Idx1 << ',' << Idx2 << ">" << std::endl;
 
 		// you can set sum1 = -1 to compare (sum_exist1) and (sum_exist2)
 		T sum1 = A[Idx1]+A[Idx2];
 
-		QueryPerformanceCounter(&t1);
+		_t.run();
 
 		T sum2 = fun(A, sum1, LENGTH);
 
-		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+		_t.stop(); _t.print();
 
 		std::cout << sum1 << "==" << sum2 << std::endl;
 	}
@@ -152,11 +179,11 @@ public:
 		arrayAdd(A, A+LENGTH, cnt);
 
 		int left, right;
-		QueryPerformanceCounter(&t1);
+		_t.run();
 
 		T sum = _maxsum(fun, A, LENGTH, left, right);
 
-		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+		_t.stop(); _t.print();
 
 		std::cout << "Maxsum: " << sum << ", in (" << left << "," << right << ")"<< std::endl;
 	}
@@ -168,30 +195,39 @@ public:
 
 		randomFill(A, A+LENGTH);
 
-		QueryPerformanceCounter(&t1);
+		_t.run();
 
 		T maximum = fun(A, LENGTH);
 
-		QueryPerformanceCounter(&t2); elapsedTime(t1, t2);
+		_t.stop(); _t.print();
 
 		std::cout << "Maximum: " << maximum << std::endl;
 	}
 
+	void benchBFPRT()
+	{
+		randomFill(A, A+LENGTH);
+		std::copy(A, A+LENGTH, B);
+
+		_t.run();
+
+		clrs::BFPRT(A, 0, LENGTH-1, LENGTH/4);
+		
+		_t.stop(); _t.print();
+		std::cout << A[LENGTH/4] << std::endl;
+
+		_t.run();
+
+		std::nth_element(B, B+LENGTH/4, B+LENGTH);
+
+		_t.stop(); _t.print();
+		std::cout << B[LENGTH/4] << std::endl;
+	}
+
 private:
 
-	LARGE_INTEGER t1, t2;
-	T *A;
-
-	void elapsedTime(LARGE_INTEGER t1, LARGE_INTEGER t2)
-	{
-		LARGE_INTEGER frequency;
-		double elapsedTime;
-
-		QueryPerformanceFrequency(&frequency);
-
-		elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
-		std::cout << elapsedTime << " ms.\n";
-	}
+	T *A, *B;
+	Timer _t;
 
 	void print(T *l, T *r)
 	{
@@ -215,7 +251,12 @@ private:
 
 	template <>
 	char _rand<char>() {
-		return char(rand());
+		return rand()&0xff;
+	}
+
+	template <>
+	unsigned char _rand<unsigned char>() {
+		return rand()&0xff;
 	}
 
 	void randomFill(T *l, T *r)
@@ -235,6 +276,7 @@ private:
 			print(l, r);
 	}
 
+	// std::is_sorted, std::is_sorted_untill
 	void assertSorted(T *l, T *r)
 	{
 		if (ISPRINT)

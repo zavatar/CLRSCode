@@ -23,6 +23,13 @@ void exchange(T &a, T &b)
 	T tmp = a; a = b; b = tmp;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// Sort:
+// STL(algorithm): sort, stable_sort, partial_sort, partial_sort_copy,
+//                 is_sorted, is_sorted_until, nth_element.
+//
+//////////////////////////////////////////////////////////////////////////
 // NOTE: 
 // 1. For supporting index 0, 'i' must be signed.
 template <typename T>
@@ -41,8 +48,15 @@ void INSERTION_SORT(T *A, int A_length)
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// Merge:
+// STL(algorithm): merge, inplace_merge, [includes?], set_union, 
+//                 set_intersection, set_difference, set_symmetric_difference
+//
+//////////////////////////////////////////////////////////////////////////
 // NOTE: 
-// 1. The infinite number using FLT_MAX violate typename T. updated by Excercise 2.3-2
+// 1. The infinite number using FLT_MAX violate typename T. updated by Exercise 2.3-2
 // 2. For indexing from 0, note the change $2.
 template <typename T>
 void MERGE(T *A, int p, int q, int r)
@@ -87,8 +101,12 @@ void MERGE_SORT(T *A, int p, int r)
 	}
 }
 
-// NOTE: 
+//////////////////////////////////////////////////////////////////////////
 //
+// Binary Search:
+// STL(algorithm): binary_search, equal_range, lower_bound/upper_bound.
+//
+//////////////////////////////////////////////////////////////////////////
 template <typename T>
 int ITERATIVE_BINARY_SEARCH(T *A, T v, int low, int high)
 {
@@ -119,6 +137,13 @@ int RECURSIVE_BINARY_SEARCH(T *A, T v, int low, int high)
 		return RECURSIVE_BINARY_SEARCH(A, v, low, mid-1);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// Partitions:
+// STL(algorithm): is_partitioned, partition, stable_partition, 
+//                 partition_copy, partition_point
+//
+//////////////////////////////////////////////////////////////////////////
 template <typename T>
 int PARTITION(T *A, int p, int r)
 {
@@ -177,6 +202,190 @@ void TAIL_RECURSIVE_QUICKSORT(T *A, int p, int r)
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// Heap:
+// STL(algorithm): is_heap, is_heap_until(c11), make_heap, push_heap,
+//                 pop_heap, sort_heap.
+//
+//////////////////////////////////////////////////////////////////////////
+
+inline int HEAP_PARENT(int i)
+{
+	return i/2;
+}
+
+inline int HEAP_LEFT(int i)
+{
+	return 2*i;
+}
+
+inline int HEAP_RIGHT(int i)
+{
+	return 2*i+1;
+}
+
+// O(lgn)
+template <typename T>
+void MAX_HEAPIFY(T *A, int A_heap_size, int i)
+{
+	int l = HEAP_LEFT(i);
+	int r = HEAP_RIGHT(i);
+	int largest;
+	if (l < A_heap_size && A[l] > A[i])
+		largest = l;
+	else
+		largest = i;
+	if (r < A_heap_size && A[r] > A[largest])
+		largest = r;
+	if (largest != i)
+	{
+		exchange(A[i], A[largest]);
+		MAX_HEAPIFY(A, A_heap_size, largest);
+	}
+}
+
+// std::make_heap O(3*n)
+template <typename T>
+void BUILD_MAX_HEAP(T *A, int A_heap_size)
+{
+	for (int i(A_heap_size/2-1); i >= 0; i--)
+		MAX_HEAPIFY(A, A_heap_size, i);
+}
+
+// O(nlgn)
+template <typename T>
+void HEAPSORT(T *A, int A_length)
+{
+	int A_heap_size = A_length;
+	BUILD_MAX_HEAP(A, A_heap_size);
+	for (int i(A_length-1); i > 0; i--)
+	{
+		exchange(A[0], A[i]);
+		A_heap_size = A_heap_size-1;
+		MAX_HEAPIFY(A, A_heap_size, 0);
+	}
+}
+
+// O(nlgn)
+template <typename T>
+void STL_heap_sort(T l, T r)
+{
+	std::make_heap(l, r); //O(3*n)
+	std::sort_heap(l, r); //O(nlgn)
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// priority_queue:
+// STL(queue): top, push, pop, 
+//
+//////////////////////////////////////////////////////////////////////////
+
+// priority::top
+template <typename T>
+inline int HEAP_MAXIMUM(T *A)
+{
+	return A[0];
+}
+
+// pop_heap, priority_queue::pop, O(lgn)
+template <typename T>
+int HEAP_EXTRACT_MAX(T *A, int &A_heap_size)
+{
+	if (A_heap_size < 1) {
+		printf("heap underflow\n");
+		exit(-1);
+	}
+	int max = A[0];
+	A[0] = A[A_heap_size-1];
+	A_heap_size = A_heap_size-1;
+	MAX_HEAPIFY(A, A_heap_size, 0);
+	return max;
+}
+
+// O(lgn)
+template <typename T>
+void HEAP_INCREASE_KEY(T *A, int i, T key)
+{
+	if (key < A[i]) {
+		printf("new key is smaller than current key\n");
+		exit(-1);
+	}
+	A[i] = key;
+	while (i > 0 && A[HEAP_PARENT(i)] < A[i])
+	{
+		exchange(A[i], A[HEAP_PARENT(i)]);
+		i = HEAP_PARENT(i);
+	}
+}
+
+// push_heap, priority_queue::push, O(lgn)
+template <typename T>
+void MAX_HEAP_INSERT(T *A, int &A_heap_size, T key)
+{
+	A_heap_size = A_heap_size+1;
+	A[A_heap_size] = key;
+	HEAP_INCREASE_KEY(A, A_heap_size, key);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//
+//
+//////////////////////////////////////////////////////////////////////////
+template <typename T>
+void COUNTING_SORT(T *A, T *B, int A_length, int k)
+{
+	int *C = new int[k+1];
+	memset(C, 0, sizeof(int)*(k+1));//for (int i(0); i <= k; i++) C[i] = 0;
+	for (int i(0); i < A_length; i++) C[A[i]]++;
+	for (int i(1); i <= k; i++) C[i] += C[i-1];
+	if (A == B) {
+		T *D = new T[A_length];
+		memcpy(D, A, A_length*sizeof(T));
+		for (int i(A_length-1); i >= 0; i--) B[--C[D[i]]] = D[i];
+		delete []D;
+	} else
+		for (int i(A_length-1); i >= 0; i--) B[--C[A[i]]] = A[i];
+	delete []C;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// nth_element.
+//
+//////////////////////////////////////////////////////////////////////////
+template <typename T>
+void BFPRT(T *A, int p, int r, int nth)
+{
+#define G 5
+	if (r-p >= 16) {
+		int m=G/2, k=p;
+		for (int i=p; i<=r; i+=G)
+		{
+			if (r-i<G) m=(r-i)/2;
+			INSERTION_SORT(A+i, G);
+			exchange(A[k++], A[i+m]);
+		}
+		int mid = (p + k) / 2;
+		BFPRT(A, p, k, mid);
+		exchange(A[mid], A[r]);
+		mid = PARTITION(A, p, r);
+		if (mid <= nth)
+			BFPRT(A, mid, r, nth);
+		else
+			BFPRT(A, p, mid, nth);
+	} else
+		INSERTION_SORT(A+p, r-p+1);
+#undef G
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// Exercises:
+//
+//////////////////////////////////////////////////////////////////////////
 // NOTE: 
 // 1. The infinite number using FLT_MAX violate typename T. 
 // (Could be solved using template in the future.)
@@ -245,108 +454,104 @@ T FIND_MAXIMUM_SUBARRAY(T *A, int low, int high,
 	}
 }
 
-inline int HEAP_PARENT(int i)
-{
-	return i/2;
-}
-
-inline int HEAP_LEFT(int i)
-{
-	return 2*i;
-}
-
-inline int HEAP_RIGHT(int i)
-{
-	return 2*i+1;
-}
-
+//////////////////////////////////////////////////////////////////////////
+//
+// Dynamic Programming (DP)
+//
+//////////////////////////////////////////////////////////////////////////
 template <typename T>
-void MAX_HEAPIFY(T *A, int A_heap_size, int i)
+void Bottom_Up_Cut_Rod(T* p, int n, T* r, int* s)
 {
-	int l = HEAP_LEFT(i);
-	int r = HEAP_RIGHT(i);
-	int largest;
-	if (l < A_heap_size && A[l] > A[i])
-		largest = l;
-	else
-		largest = i;
-	if (r < A_heap_size && A[r] > A[largest])
-		largest = r;
-	if (largest != i)
+	T q;
+	int i,j;
+	r[0]=s[0]=0;
+	for (j=0; j<n; r[++j]=q)
+		for (i=0, q=-1; i<=j; i++)
+			if (q < p[i]+r[j-i]) {
+				q = p[i]+r[j-i];
+				s[j+1]=i+1; }
+}
+template <typename T>
+void Print_Cut_Rod(T* p, int n)
+{
+	T *r = new T[n+1];
+	int *s = new int[n+1];
+	Bottom_Up_Cut_Rod(p, n, r, s);
+	while (n>0) {
+		std::cout<<s[n]<<" ";
+		n-=s[n];
+	}
+	std::cout<<std::endl;
+	delete []r;
+	delete []s;
+}
+
+// Longest Increase Sequence O(n^2)
+template <typename T>
+void LIS(T* p, int n, int* f, int* s)
+{
+	int i,j,q;
+	s[0]=-1;
+	for (j=0; j<n; f[j++]=q+1)
+		for (i=0, q=0; i<j; i++)
+			if (p[i]<p[j] && q<f[i])
+				q=f[s[j]=i];
+}
+template <typename T>
+int bsearch(T *d, int n, int a)   
+{   
+	int  l=0, r=n-1;   
+	while( l <= r )  
+	{   
+		int  mid = (l+r)>>1;   
+		if( a > d[mid-1] && a <= d[mid] )   
+			return mid;             // >&&<= »»Îª: >= && <   
+		else if( a <d[mid] )   
+			r = mid-1;   
+		else l = mid+1;   
+	}   
+}   
+template <typename T>
+int fastLIS(T* p, int n, int* f)
+{
+	T* d = new T[n];
+	int i,j,l=1;
+	d[0]=p[0]; f[0]=1;
+	for (i=1; i<n; i++)
 	{
-		exchange(A[i], A[largest]);
-		MAX_HEAPIFY(A, A_heap_size, largest);
+		if (p[i]<=d[0]) j=0;			// <= »»Îª: < 
+		else if (p[i]>d[l-1]) j=l++;// > »»Îª: >=
+		else j=bsearch(d, l, p[i]);
+		d[j]=p[i];
+		f[i]=j+1;
 	}
+	delete []d;
+	return l;
 }
-
+// Longest Increase Sequence
 template <typename T>
-void BUILD_MAX_HEAP(T *A, int A_heap_size)
+int Print_LIS(T* p, int n)
 {
-	for (int i(A_heap_size/2-1); i >= 0; i--)
-		MAX_HEAPIFY(A, A_heap_size, i);
-}
-
-template <typename T>
-void STL_heap_sort(T l, T r)
-{
-	std::make_heap(l, r);
-	std::sort_heap(l, r);
-}
-
-template <typename T>
-void HEAPSORT(T *A, int A_length)
-{
-	int A_heap_size = A_length;
-	BUILD_MAX_HEAP(A, A_heap_size);
-	for (int i(A_length-1); i > 0; i--)
-	{
-		exchange(A[0], A[i]);
-		A_heap_size = A_heap_size-1;
-		MAX_HEAPIFY(A, A_heap_size, 0);
-	}
-}
-
-template <typename T>
-inline int HEAP_MAXIMUM(T *A)
-{
-	return A[0];
-}
-
-template <typename T>
-int HEAP_EXTRACT_MAX(T *A, int &A_heap_size)
-{
-	if (A_heap_size < 1) {
-		printf("heap underflow\n");
-		exit(-1);
-	}
-	int max = A[0];
-	A[0] = A[A_heap_size-1];
-	A_heap_size = A_heap_size-1;
-	MAX_HEAPIFY(A, A_heap_size, 0);
-	return max;
-}
-
-template <typename T>
-void HEAP_INCREASE_KEY(T *A, int i, T key)
-{
-	if (key < A[i]) {
-		printf("new key is smaller than current key\n");
-		exit(-1);
-	}
-	A[i] = key;
-	while (i > 0 && A[HEAP_PARENT(i)] < A[i])
-	{
-		exchange(A[i], A[HEAP_PARENT(i)]);
-		i = HEAP_PARENT(i);
-	}
-}
-
-template <typename T>
-void MAX_HEAP_INSERT(T *A, int &A_heap_size, T key)
-{
-	A_heap_size = A_heap_size+1;
-	A[A_heap_size] = key;
-	HEAP_INCREASE_KEY(A, A_heap_size, key);
+	int *f = new int[n];
+	int *s = new int[n];
+	LIS(p, n, f, s);
+	int l=1, k;
+	for (int i=0; i<n; i++)
+		if (l<f[i]) l=f[k=i];
+	for (int i=0; i<n; i++)
+		printf("%d ",f[i]);
+	printf("\n");
+	if (l == fastLIS(p,n,f))
+		std::cout<<l<<std::endl;
+	for (int i=0; i<n; i++)
+		printf("%d ",f[i]);
+	printf("\n");
+	delete []f;
+	for (; k>=0; k=s[k])
+		std::cout<<p[k]<<" ";
+	std::cout<<std::endl;
+	delete []s;
+	return l;
 }
 
 } // namespace

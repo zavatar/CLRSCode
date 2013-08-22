@@ -26,7 +26,60 @@ void SafeCall(cudaError err) {
 	}
 } 
 
-void PrintProp(cudaDeviceProp prop, int dev) {
+Timer::Timer()
+{
+	SafeCall(cudaEventCreate(&_start));
+	SafeCall(cudaEventCreate(&_stop));
+}
+
+void Timer::run()
+{
+	SafeCall(cudaEventRecord(_start, 0));
+}
+
+void Timer::stop()
+{
+	SafeCall(cudaEventRecord(_stop, 0));
+}
+
+float Timer::print()
+{
+	SafeCall(cudaEventSynchronize(_stop));
+	float elapsedTime;
+	SafeCall(cudaEventElapsedTime(&elapsedTime, _start, _stop));
+	printf("GPU Kernel Time: %.3f ms\n", elapsedTime);
+	return elapsedTime;
+}
+
+Timer::~Timer()
+{
+	SafeCall(cudaEventDestroy(_start));
+	SafeCall(cudaEventDestroy(_stop));
+}
+
+Device::Device( int major, int minor )
+{
+	memset(&prop, 0, sizeof(cudaDeviceProp));
+	initDevice(major, minor);
+}
+
+void Device::initDevice( int major, int minor )
+{
+	prop.major = major; prop.minor = minor;
+	SafeCall(cudaChooseDevice(&dev, &prop));
+	if (prop.major != major || prop.minor != minor) {
+		printf("Choose Device error\n");
+		exit(-1);
+	}
+	SafeCall(cudaGetDeviceProperties(&prop, dev));
+	SafeCall(cudaSetDevice(dev));
+	// Establish the context to avoid slow first call.
+	// http://stackoverflow.com/questions/10415204/how-to-create-a-cuda-context
+	cudaFree(0);
+}
+
+void Device::PrintProp()
+{
 	printf( " --- General Information for device %d ---\n", dev );
 	printf( "Name: %s\n", prop.name );
 	printf( "Compute capability: %d.%d\n", prop.major, prop.minor );
@@ -69,47 +122,16 @@ void PrintProp(cudaDeviceProp prop, int dev) {
 	printf( "\n" );
 }
 
-void InitDev()
+void CheckDims( int bn, int tn )
 {
-	int dev(-1);
-	cudaDeviceProp devProp;
-	memset(&devProp, 0, sizeof(cudaDeviceProp));
-	devProp.major = 1; devProp.minor = 3;
-	SafeCall(cudaChooseDevice(&dev, &devProp));
-	SafeCall(cudaGetDeviceProperties(&devProp, dev));
-	SafeCall(cudaSetDevice(dev));
-	PrintProp(devProp, dev);
-}
-
-Timer::Timer()
-{
-	SafeCall(cudaEventCreate(&_start));
-	SafeCall(cudaEventCreate(&_stop));
-}
-
-void Timer::run()
-{
-	SafeCall(cudaEventRecord(_start, 0));
-}
-
-void Timer::stop()
-{
-	SafeCall(cudaEventRecord(_stop, 0));
-}
-
-float Timer::print()
-{
-	SafeCall(cudaEventSynchronize(_stop));
-	float elapsedTime;
-	SafeCall(cudaEventElapsedTime(&elapsedTime, _start, _stop));
-	printf("GPU Kernel Time: %.3f ms\n", elapsedTime);
-	return elapsedTime;
-}
-
-Timer::~Timer()
-{
-	SafeCall(cudaEventDestroy(_start));
-	SafeCall(cudaEventDestroy(_stop));
+	int dev;
+	cudaDeviceProp prop;
+	SafeCall(cudaGetDevice(&dev));
+	SafeCall(cudaGetDeviceProperties(&prop, dev));
+	if (bn > prop.maxGridSize[0] || tn > prop.maxThreadsPerBlock) {
+		printf("Dimension error\n");
+		exit(-1);
+	}
 }
 
 }

@@ -21,9 +21,24 @@ namespace cuda {
 
 void SafeCall(cudaError);
 
-void PrintProp(cudaDeviceProp, int);
+void CheckDims(int bn, int tn);
 
-void InitDev();
+class Device {
+
+public:
+
+	Device(int major = 1, int minor = 3);
+
+	void PrintProp();
+
+private:
+
+	cudaDeviceProp prop;
+
+	int dev;
+
+	void initDevice(int major, int minor);
+};
 
 class Timer {
 
